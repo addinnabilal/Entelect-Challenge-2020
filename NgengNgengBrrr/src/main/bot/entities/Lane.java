@@ -1,7 +1,7 @@
-package za.co.entelect.challenge.entities;
+package main.bot.entities;
 
 import com.google.gson.annotations.SerializedName;
-import za.co.entelect.challenge.enums.Terrain;
+import main.bot.enums.Terrain;
 
 public class Lane {
     @SerializedName("position")

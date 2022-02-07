@@ -1,4 +1,4 @@
-package za.co.entelect.challenge.entities;
+package main.bot.entities;
 
 import com.google.gson.annotations.SerializedName;
 

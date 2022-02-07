@@ -1,4 +1,4 @@
-package za.co.entelect.challenge.enums;
+package main.bot.enums;
 
 public enum Direction {
 

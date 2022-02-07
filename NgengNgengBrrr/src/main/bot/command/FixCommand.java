@@ -1,4 +1,4 @@
-package za.co.entelect.challenge.command;
+package main.bot.command;
 
 public class FixCommand implements Command {
 
@@ -6,5 +6,4 @@ public class FixCommand implements Command {
     public String render() {
         return String.format("FIX");
     }
-
 }

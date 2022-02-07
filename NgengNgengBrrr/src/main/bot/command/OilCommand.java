@@ -1,4 +1,4 @@
-package za.co.entelect.challenge.command;
+package main.bot.command;
 
 public class OilCommand implements Command {
 

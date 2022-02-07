@@ -1,6 +1,6 @@
-package za.co.entelect.challenge.command;
+package main.bot.command;
 
-import za.co.entelect.challenge.enums.Direction;
+import main.bot.enums.Direction;
 
 public class ChangeLaneCommand implements Command {
 

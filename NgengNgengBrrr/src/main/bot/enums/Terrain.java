@@ -1,4 +1,4 @@
-package za.co.entelect.challenge.enums;
+package main.bot.enums;
 
 import com.google.gson.annotations.SerializedName;
 
@@ -14,13 +14,5 @@ public enum Terrain {
     @SerializedName("4")
     FINISH,
     @SerializedName("5")
-    BOOST,
-    @SerializedName("6")
-    WALL,
-    @SerializedName("7")
-    LIZARD,
-    @SerializedName("8")
-    TWEET,
-    @SerializedName("9")
-    EMP
+    BOOST
 }

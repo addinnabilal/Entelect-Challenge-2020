@@ -1,8 +1,8 @@
-package za.co.entelect.challenge.entities;
+package main.bot.entities;
 
 import com.google.gson.annotations.SerializedName;
-import za.co.entelect.challenge.enums.PowerUps;
-import za.co.entelect.challenge.enums.State;
+import main.bot.enums.PowerUps;
+import main.bot.enums.State;
 
 public class Car {
     @SerializedName("id")
@@ -14,11 +14,11 @@ public class Car {
     @SerializedName("speed")
     public int speed;
 
-    @SerializedName("damage")
-    public int damage;
-
     @SerializedName("state")
     public State state;
+
+    @SerializedName("damage")
+    public int damage;
 
     @SerializedName("powerups")
     public PowerUps[] powerups;

@@ -1,4 +1,4 @@
-package za.co.entelect.challenge.command;
+package main.bot.command;
 
 public interface Command {
     String render();
