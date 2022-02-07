@@ -6,7 +6,6 @@ import main.bot.entities.GameState;
 
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.Random;
 import java.util.Scanner;
 
 public class Main {
@@ -15,7 +14,8 @@ public class Main {
     private static final String STATE_FILE_NAME = "state.json";
 
     /**
-     * Read the current state, feed it to the bot, get the output and print it to stdout
+     * Read the current state, feed it to the bot, get the output and print it to
+     * stdout
      *
      * @param args the args
      **/
@@ -23,9 +23,9 @@ public class Main {
 
         Scanner sc = new Scanner(System.in);
         Gson gson = new Gson();
-        Random random = new Random(System.nanoTime());
+        Bot bot = new Bot();
 
-        while(true) {
+        while (true) {
             try {
                 int roundNumber = sc.nextInt();
 
@@ -33,7 +33,7 @@ public class Main {
                 String state = new String(Files.readAllBytes(Paths.get(statePath)));
 
                 GameState gameState = gson.fromJson(state, GameState.class);
-                Command command = new Bot(random, gameState).run();
+                Command command = bot.run(gameState);
 
                 System.out.println(String.format("C;%d;%s", roundNumber, command.render()));
             } catch (Exception e) {
