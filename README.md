@@ -1,1 +1,0 @@
-# Entellect-Challenge-
