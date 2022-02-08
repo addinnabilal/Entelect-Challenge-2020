@@ -41,47 +41,47 @@ public class Bot {
         List<Object> blocks = getBlocksInFront(myCar.position.lane, myCar.position.block, gameState);
         List<Object> nextBlocks = blocks.subList(0,1);
 
-        //Fix first if too damaged to move
-        if(myCar.damage == 5) {
-            return FIX;
-        }
-        //Accelerate first if going to slow
-        if(myCar.speed <= 3) {
-            return ACCELERATE;
-        }
+//        //Fix first if too damaged to move
+//        if(myCar.damage == 5) {
+//            return FIX;
+//        }
+//        //Accelerate first if going to slow
+//        if(myCar.speed <= 3) {
+//            return ACCELERATE;
+//        }
+//
+//        //Basic fix logic
+//        if(myCar.damage >= 5) {
+//            return FIX;
+//        }
+//
+//        //Basic avoidance logic
+//        if (blocks.contains(Terrain.MUD) || nextBlocks.contains(Terrain.WALL)) {
+//            if (hasPowerUp(PowerUps.LIZARD, myCar.powerups)) {
+//                return LIZARD;
+//            }
+//            if (nextBlocks.contains(Terrain.MUD) || nextBlocks.contains(Terrain.WALL)) {
+//                int i = random.nextInt(directionList.size());
+//                return directionList.get(i);
+//            }
+//        }
+//
+//        //Basic improvement logic
+//        if (hasPowerUp(PowerUps.BOOST, myCar.powerups)) {
+//            return BOOST;
+//        }
+//
+//        //Basic aggression logic
+//        if (myCar.speed == maxSpeed) {
+//            if (hasPowerUp(PowerUps.OIL, myCar.powerups)) {
+//                return OIL;
+//            }
+//            if (hasPowerUp(PowerUps.EMP, myCar.powerups)) {
+//                return EMP;
+//            }
+//        }
 
-        //Basic fix logic
-        if(myCar.damage >= 5) {
-            return FIX;
-        }
-
-        //Basic avoidance logic
-        if (blocks.contains(Terrain.MUD) || nextBlocks.contains(Terrain.WALL)) {
-            if (hasPowerUp(PowerUps.LIZARD, myCar.powerups)) {
-                return LIZARD;
-            }
-            if (nextBlocks.contains(Terrain.MUD) || nextBlocks.contains(Terrain.WALL)) {
-                int i = random.nextInt(directionList.size());
-                return directionList.get(i);
-            }
-        }
-
-        //Basic improvement logic
-        if (hasPowerUp(PowerUps.BOOST, myCar.powerups)) {
-            return BOOST;
-        }
-
-        //Basic aggression logic
-        if (myCar.speed == maxSpeed) {
-            if (hasPowerUp(PowerUps.OIL, myCar.powerups)) {
-                return OIL;
-            }
-            if (hasPowerUp(PowerUps.EMP, myCar.powerups)) {
-                return EMP;
-            }
-        }
-
-        return ACCELERATE;
+        return TURN_RIGHT;
     }
 
     private Boolean hasPowerUp(PowerUps powerUpToCheck, PowerUps[] available) {
