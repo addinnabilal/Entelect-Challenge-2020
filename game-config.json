@@ -1,6 +1,6 @@
 {
 	"NUMBER_OF_LANES": 4,
-    "TRACK_LENGTH": 200,
+    "TRACK_LENGTH": 100,
     "MIN_LANE": 1,
     "MAX_LANE": 4,
     "MAX_ROUNDS": 600,
