@@ -9,6 +9,7 @@ import java.security.SecureRandom;
 import java.util.*;
 
 import static java.lang.Math.max;
+import static java.lang.Math.abs;
 
 public class Bot {
 
@@ -90,6 +91,24 @@ public class Bot {
            }
        }
        */
+    }
+
+    private int total_point_using_powerups(PowerUps powerUpToCheck, GameState gameState) {
+        Car myCar = gameState.player;
+        Car opponent = gameState.opponent;
+        int point = 0;
+        switch (powerUpToCheck) {
+            case EMP:
+                int diff = abs(opponent.position.lane - myCar.position.lane);
+                if ( diff <= 1 ) {
+                    point = 8;
+                }
+                break;
+            case BOOST:
+
+
+        }
+        return point;
     }
 
     private boolean damage_check(Car myCar){
