@@ -1,6 +1,5 @@
 package main.bot;
 
-import jdk.nashorn.internal.ir.Block;
 import main.bot.command.*;
 import main.bot.entities.*;
 import main.bot.enums.Terrain;
@@ -51,6 +50,7 @@ public class Bot {
         }
 
         //Check power-ups
+        //Cek juga ga lagi ngeboost/power up lain
         if (powerups_to_use.get(0) > 0)
         {
             return use_powerups(powerups_to_use.get(1));
@@ -106,6 +106,12 @@ public class Bot {
         Car myCar = gameState.player;
         Car opponent = gameState.opponent;
 
+        //List all obstacles
+        List<Object> obstacles = new ArrayList<>();
+        obstacles.add(Terrain.MUD);
+        obstacles.add(Terrain.OIL_SPILL);
+        obstacles.add(Terrain.WALL); //belum nambah truck elon sama block lizard
+
         //Default Point
         int point = 0;
 
@@ -121,7 +127,7 @@ public class Bot {
                 }
                 break;
             case BOOST:
-                if (blocks.contains(Terrain.MUD) || blocks.contains(Terrain.OIL_SPILL))
+                if (!(blocks.containsAll(obstacles)) && myCar.damage == 0)
                 {
                     point = 10;
                 }
@@ -132,40 +138,32 @@ public class Bot {
                 {
                     point = 5;
                 }
+                break;
             case LIZARD:
                 List<Object> landingBlocks = blocks.subList(0,myCar.speed);
-
-                //List all obstacles
-                List<Object> obstacles = new ArrayList<>();
-                obstacles.add(Terrain.MUD);
-                obstacles.add(Terrain.OIL_SPILL);
-                obstacles.add(Terrain.WALL); //belum nambah truck elon sama block lizard
-
-                //List all power_ups
-                List<Object> power_ups = new ArrayList<>();
-                power_ups.add(Terrain.OIL_POWER);
-                power_ups.add(Terrain.BOOST);
-                power_ups.add(Terrain.EMP);
-                power_ups.add(Terrain.TWEET);
-                power_ups.add(Terrain.LIZARD);
 
                 if (!(landingBlocks.containsAll(obstacles)))
                 {
                     point = 3;
-                }
 
-                for (int i = 0; i < blocks.size(); i++)
-                {
-                    if (blocks.subList(i,i+1).containsAll(power_ups))
+                    //List all object
+                    List<Integer> allObstacles = getNumOfBlockInFront(3, gameState);
+
+                    for (int i = 0; i < allObstacles.size(); i++)
                     {
-                        point -= 1;
-                    }
-                    if (blocks.subList(i,i+1).containsAll(obstacles))
-                    {
-                        point += 1;
+                        //Mengandung MUD/OILSPILL/WALL
+                        if (Arrays.asList(0, 1, 5).contains(i)) //ekuivalen sama (if i in [0, 1, 5])
+                        {
+                            point += allObstacles.get(i);
+                        }
+                        //Mengandung POWER UP
+                        if (Arrays.asList(2, 4, 6, 7, 8).contains(i))
+                        {
+                            point -= allObstacles.get(i);
+                        }
                     }
                 }
-
+                break;
         }
 
         //Check if player have the powerups
@@ -238,7 +236,6 @@ public class Bot {
 
     private int max_speed_check(Car myCar){
         int maxSpeed;
-
         switch(myCar.damage) {
             case 5:
                 maxSpeed = 0;
@@ -299,4 +296,38 @@ public class Bot {
         return blocks;
     }
 
+    private List<Integer> getNumOfBlockInFront(int currSpeed, GameState gameState){
+        //Game and player state
+        Car myCar = gameState.player;
+        List<Object> blocks = getBlocksInFront(myCar.position.lane, myCar.position.block, gameState); //bisa tambahin parameter currspeed nnti
+
+        //Number of each block
+        List<Integer> NumOfBlockInFront = Arrays.asList(0, 0, 0, 0, 0, 0, 0, 0, 0);
+
+        // Itterate through each blocl
+        // cant use swithc case, bcs we comparing objects
+        for (Object block : blocks) {
+            if (block == Terrain.MUD) {
+                NumOfBlockInFront.set(0, NumOfBlockInFront.get(0) + 1);
+            } else if (block == Terrain.OIL_SPILL) {
+                NumOfBlockInFront.set(1, NumOfBlockInFront.get(1) + 1);
+            } else if (block == Terrain.OIL_POWER) {
+                NumOfBlockInFront.set(2, NumOfBlockInFront.get(2) + 1);
+            } else if (block == Terrain.FINISH) {
+                NumOfBlockInFront.set(3, NumOfBlockInFront.get(3) + 1);
+            } else if (block == Terrain.BOOST) {
+                NumOfBlockInFront.set(4, NumOfBlockInFront.get(4) + 1);
+            } else if (block == Terrain.WALL) {
+                NumOfBlockInFront.set(5, NumOfBlockInFront.get(5) + 1);
+            } else if (block == Terrain.LIZARD) {
+                NumOfBlockInFront.set(6, NumOfBlockInFront.get(6) + 1);
+            } else if (block == Terrain.TWEET) {
+                NumOfBlockInFront.set(7, NumOfBlockInFront.get(7) + 1);
+            } else if (block == Terrain.EMP) {
+                NumOfBlockInFront.set(8, NumOfBlockInFront.get(8) + 1);
+            }
+        }
+
+        return  NumOfBlockInFront;
+    }
 }
