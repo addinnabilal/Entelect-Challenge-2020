@@ -2,8 +2,7 @@ package main.bot;
 
 import main.bot.command.*;
 import main.bot.entities.*;
-import main.bot.enums.Terrain;
-import main.bot.enums.PowerUps;
+import main.bot.enums.*;
 
 import java.security.SecureRandom;
 import java.util.*;
@@ -149,25 +148,41 @@ public class Bot {
         }
         return  maxSpeed;
     }
-    
+
+    private int get_next_speed_if_acc(Car myCar){
+        switch (myCar.speed){
+            case 0 :
+                return 3;
+            case 3  :
+            case 5 :
+                return 6;
+            case 6 :
+                return 8;
+            case 8 :
+                return 9;
+            default:
+                return 0;
+        }
+    }
+
     private int current_speed_if(Car myCar,State carState){
         int currSpeed, maxSpeed=max_speed_check(myCar);
         switch(carState){
-            case ACCELERATE:
-                if (myCar.speed != maxSpeed && myCar.speed != BOOST_SPEED) {
-                    currSpeed = SPEEDS[SPEEDS.indexOf(this.speed) + 1];
+            case ACCELERATING:
+                if (myCar.speed != maxSpeed && myCar.speed != 15) {
+                    currSpeed = get_next_speed_if_acc(myCar);
                 }
                 else {
                     currSpeed=myCar.speed;
                 }
                 break;
-            case TURN_LEFT:
+            case TURNING_LEFT:
                 currSpeed=myCar.speed-1;
                 break;
-            case TURN_RIGHT:
+            case TURNING_RIGHT:
                 currSpeed=myCar.speed-1;
                 break;
-            case USE_BOOST:
+            case USED_BOOST:
                 currSpeed=15;
                 break;
             default:
@@ -178,7 +193,7 @@ public class Bot {
     }
     private int point_per_block(Object blockToBeChecked){
         int blockPoint;
-        switch(blockToBeChecked.contains(obstacleOrPowerUp)) {
+        switch(blockToBeChecked) {
             case Terrain.MUD:
                 blockPoint=-3;
                 break;
@@ -196,7 +211,6 @@ public class Bot {
                 break;
             case Terrain.LIZARD:
                 blockPoint=3;
-                break;
                 break;
             case Terrain.TWEET:
                 blockPoint=3;
