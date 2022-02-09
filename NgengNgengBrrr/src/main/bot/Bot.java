@@ -1,6 +1,5 @@
 package main.bot;
 
-import jdk.nashorn.internal.ir.Block;
 import main.bot.command.*;
 import main.bot.entities.*;
 import main.bot.enums.Terrain;
@@ -132,6 +131,7 @@ public class Bot {
                 {
                     point = 5;
                 }
+                break;
             case LIZARD:
                 List<Object> landingBlocks = blocks.subList(0,myCar.speed);
 
@@ -193,7 +193,7 @@ public class Bot {
         points_using_powerups.add(total_point_using_powerups(PowerUps.LIZARD, gameState, blocks));
 
         //Looking for best powerups
-        Integer max_points = 0, command = 0;
+        int max_points = 0, command = 0;
         for (int i = 0; i < points_using_powerups.size(); i++)
         {
             if (max_points < points_using_powerups.get(i))
@@ -228,12 +228,7 @@ public class Bot {
 
     private boolean damage_check(Car myCar){
         int maxSpeed = max_speed_check(myCar);
-        if (myCar.speed == maxSpeed && (maxSpeed < 8 || (hasPowerUp(PowerUps.BOOST, myCar.powerups))))
-        {
-            return true;
-        }
-
-        return  false;
+        return myCar.speed == maxSpeed && (maxSpeed < 8 || (hasPowerUp(PowerUps.BOOST, myCar.powerups)));
     }
 
     private int max_speed_check(Car myCar){
