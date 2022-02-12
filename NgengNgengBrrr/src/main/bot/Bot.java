@@ -2,7 +2,9 @@ package main.bot;
 
 import main.bot.command.*;
 import main.bot.entities.*;
-import main.bot.enums.*;
+import main.bot.enums.State;
+import main.bot.enums.Terrain;
+import main.bot.enums.PowerUps;
 
 import java.security.SecureRandom;
 import java.util.*;
@@ -14,6 +16,15 @@ public class Bot {
 
     private static final int maxSpeed = 9;
     private List<Command> directionList = new ArrayList<>();
+
+    private static final int MINIMUM_SPEED = 0;
+    private static final int SPEED_STATE_1 = 3;
+    private static final int INITIAL_SPEED = 5;
+    private static final int SPEED_STATE_2 = 6;
+    private static final int SPEED_STATE_3 = 8;
+    private static final int MAXIMUM_SPEED = 9;
+    private static final int BOOST_SPEED = 15;
+    List<Integer> SPEEDS = Arrays.asList(MINIMUM_SPEED, SPEED_STATE_1, INITIAL_SPEED, SPEED_STATE_2, SPEED_STATE_3, MAXIMUM_SPEED);
 
     private final Random random;
 
@@ -40,89 +51,159 @@ public class Bot {
         //Basic fix logic
         List<Object> blocks = getBlocksInFront(myCar.position.lane, myCar.position.block, gameState);
         List<Object> nextBlocks = blocks.subList(0,1);
+        List<Integer> power_ups_points = get_total_points_using_powerups(gameState, blocks);
+        List<Integer> lane_points = getPointsOfAllLane(power_ups_points, gameState);
+        Command COMMAND = choosingLane(lane_points, power_ups_points, gameState);
 
         //Check damage
-        if (damage_check(myCar))
+        if (damage_check(myCar) && myCar.state != State.USED_BOOST)
         {
             return FIX;
         }
 
-        //Else accelerate
-        return ACCELERATE;
-        /*
-       //Fix first if too damaged to move
-       if(myCar.damage == 5) {
-           return FIX;
-       }
-       //Accelerate first if going to slow
-       if(myCar.speed <= 3) {
-           return ACCELERATE;
-       }
-
-       //Basic fix logic
-       if(myCar.damage >= 5) {
-           return FIX;
-       }
-
-       //Basic avoidance logic
-       if (blocks.contains(Terrain.MUD) || nextBlocks.contains(Terrain.WALL)) {
-           if (hasPowerUp(PowerUps.LIZARD, myCar.powerups)) {
-               return LIZARD;
-           }
-           if (nextBlocks.contains(Terrain.MUD) || nextBlocks.contains(Terrain.WALL)) {
-               int i = random.nextInt(directionList.size());
-               return directionList.get(i);
-           }
-       }
-
-       //Basic improvement logic
-       if (hasPowerUp(PowerUps.BOOST, myCar.powerups)) {
-           return BOOST;
-       }
-
-       //Basic aggression logic
-       if (myCar.speed == maxSpeed) {
-           if (hasPowerUp(PowerUps.OIL, myCar.powerups)) {
-               return OIL;
-           }
-           if (hasPowerUp(PowerUps.EMP, myCar.powerups)) {
-               return EMP;
-           }
-       }
-       */
+        //Check power-ups
+        //Cek juga ga lagi ngeboost/power up lain
+        return COMMAND;
     }
 
-    private int total_point_using_powerups(PowerUps powerUpToCheck, GameState gameState) {
+    private int total_point_using_powerups(PowerUps powerUpToCheck, GameState gameState, List<Object> blocks ) {
+        //Player & Enemy Car Condition
         Car myCar = gameState.player;
         Car opponent = gameState.opponent;
+
+        //List all obstacles
+        List<Object> obstacles = new ArrayList<>();
+        obstacles.add(Terrain.MUD);
+        obstacles.add(Terrain.OIL_SPILL);
+        obstacles.add(Terrain.WALL); //belum nambah truck elon sama block lizard
+
+        //Default Point
         int point = 0;
+
+        //Block positions difference
+        int diff;
+
+        //Count point per power_ups
         switch (powerUpToCheck) {
             case EMP:
-                int diff = abs(opponent.position.lane - myCar.position.lane);
+                diff = abs(opponent.position.lane - myCar.position.lane);
                 if ( diff <= 1 ) {
                     point = 8;
                 }
                 break;
             case BOOST:
+                if (!(blocks.containsAll(obstacles)) && myCar.damage == 0)
+                {
+                    point = 10;
+                }
+                break;
+            case OIL:
+                diff = abs(opponent.position.block - myCar.position.block);
+                if (myCar.position.lane == opponent.position.lane && diff <= opponent.speed)
+                {
+                    point = 5;
+                }
+                break;
+            case LIZARD:
+                int distanceLeft = gameState.lanes.get(0)[gameState.lanes.get(0).length-1].position.block - myCar.position.block;
+                List<Object> landingBlocks = blocks.subList(0, Math.min(distanceLeft, myCar.speed)-1);
+                int currBlock=myCar.position.block;
 
+                if (!(landingBlocks.containsAll(obstacles)))
+                {
+                    point = 3;
 
+                    //List all object
+                    List<Integer> allObstacles = getNumOfBlockInFront(3, currBlock, 0, gameState);
+
+                    for (int i = 0; i < allObstacles.size(); i++)
+                    {
+                        //Mengandung MUD/OILSPILL/WALL
+                        if (Arrays.asList(0, 1, 5).contains(i)) //ekuivalen sama (if i in [0, 1, 5])
+                        {
+                            point += allObstacles.get(i);
+                        }
+                        //Mengandung POWER UP
+                        if (Arrays.asList(2, 4, 6, 7, 8).contains(i))
+                        {
+                            point -= allObstacles.get(i);
+                        }
+                    }
+                }
+                break;
         }
-        return point;
+
+        //Check if player have the powerups
+        if (hasPowerUp(powerUpToCheck, myCar.powerups))
+        {
+            return point;
+        }
+        else
+        {
+            return 0;
+        }
+    }
+
+    private List<Integer> get_total_points_using_powerups(GameState gameState, List<Object> blocks ){
+        //Looking for the best powerups to use, return in 2d array <points,command>
+        List<Integer> points_using_powerups = new ArrayList<Integer>();
+
+        //Points from EMP
+        points_using_powerups.add(total_point_using_powerups(PowerUps.EMP, gameState, blocks));
+        //Points from BOOST
+        points_using_powerups.add(total_point_using_powerups(PowerUps.BOOST, gameState, blocks));
+        //Points from OIL
+        points_using_powerups.add(total_point_using_powerups(PowerUps.OIL, gameState, blocks));
+        //Points from LIZARD
+        points_using_powerups.add(total_point_using_powerups(PowerUps.LIZARD, gameState, blocks));
+
+        //Looking for best powerups
+        int max_points = 0, command = 0;
+        for (int i = 0; i < points_using_powerups.size(); i++)
+        {
+            if (max_points < points_using_powerups.get(i))
+            {
+                max_points = points_using_powerups.get(i);
+                command = i + 1;
+            }
+        }
+
+        //Return best powerups
+        List<Integer> powerups_to_use = new ArrayList<Integer>();
+        if (max_points==0 && command==points_using_powerups.size()){
+            powerups_to_use.add(null);
+            powerups_to_use.add(null);
+        }
+        else{
+            powerups_to_use.add(max_points);
+            powerups_to_use.add(command);
+        }
+
+        return  powerups_to_use;
+    }
+
+    private Command use_powerups(int commandNum){
+        switch (commandNum) {
+            case 1:
+                return EMP;
+            case 2:
+                return BOOST;
+            case 3:
+                return OIL;
+            case 4:
+                return LIZARD;
+            default:
+                return ACCELERATE;
+        }
     }
 
     private boolean damage_check(Car myCar){
         int maxSpeed = max_speed_check(myCar);
-        if (myCar.speed == maxSpeed && (maxSpeed < 8 || (hasPowerUp(PowerUps.BOOST, myCar.powerups))))
-        {
-            return true;
-        }
-
-        return  false;
+        return myCar.speed == maxSpeed && (maxSpeed < 8 || (hasPowerUp(PowerUps.BOOST, myCar.powerups)));
     }
 
     private int max_speed_check(Car myCar){
         int maxSpeed;
-
         switch(myCar.damage) {
             case 5:
                 maxSpeed = 0;
@@ -149,124 +230,28 @@ public class Bot {
         return  maxSpeed;
     }
 
-    private int get_next_speed_if_acc(Car myCar){
-        switch (myCar.speed){
-            case 0 :
-                return 3;
-            case 3  :
-            case 5 :
-                return 6;
-            case 6 :
-                return 8;
-            case 8 :
-                return 9;
-            default:
-                return 0;
-        }
-    }
-
-    private int current_speed_if(Car myCar,State carState){
+    private int current_speed_if(Car myCar, Command command){
         int currSpeed, maxSpeed=max_speed_check(myCar);
-        switch(carState){
-            case ACCELERATING:
-                if (myCar.speed != maxSpeed && myCar.speed != 15) {
-                    currSpeed = get_next_speed_if_acc(myCar);
-                }
-                else {
-                    currSpeed=myCar.speed;
-                }
-                break;
-            case TURNING_LEFT:
-                currSpeed=myCar.speed-1;
-                break;
-            case TURNING_RIGHT:
-                currSpeed=myCar.speed-1;
-                break;
-            case USED_BOOST:
-                currSpeed=15;
-                break;
-            default:
+        if (command==ACCELERATE){
+            if (myCar.speed != maxSpeed && myCar.speed != BOOST_SPEED) {
+                currSpeed = SPEEDS.get(SPEEDS.indexOf(myCar.speed) + 1);
+            }
+            else {
                 currSpeed=myCar.speed;
-                break;
+            }
+        }
+        else if (command==TURN_LEFT || command==TURN_RIGHT){
+            currSpeed=myCar.speed-1;
+        }
+        else if(command==BOOST){
+            currSpeed=15;
+        }
+        else{
+            currSpeed=myCar.speed;
         }
         return currSpeed;
     }
-    private int point_per_block(Object blockToBeChecked){
-        int blockPoint;
-        switch(blockToBeChecked) {
-            case Terrain.MUD:
-                blockPoint=-3;
-                break;
-            case Terrain.OIL_SPILL:
-                blockPoint=-3;
-                break;
-            case Terrain.WALL:
-                blockPoint=-5;
-                break;
-            case Terrain.EMP:
-                blockPoint=5;
-                break;
-            case Terrain.BOOST:
-                blockPoint=5;
-                break;
-            case Terrain.LIZARD:
-                blockPoint=3;
-                break;
-            case Terrain.TWEET:
-                blockPoint=3;
-                break;
-            case Terrain.OIL_POWER:
-                blockPoint=3;
-                break;
-            default:
-                blockPoint=0;
-                break;
-        }
-        return blockPoint;
-    }
-
-    private int total_points_in_a_lane(int y,int x, GameState gameState, State carState){
-        GameState tempGameState = new GameState(gameState);        
-        tempGameState.player.state=carState;
-        speed=current_speed_if(myCar, carState);
-        List<Object> blocks = getBlocksInFront(y, x, tempGameState, speed);
-        List<Object> nextBlock;
-        int points=0;
-        while (fromIndex >= 0  && toIndex <= blocks.size && fromIndex < toIndex){
-            nextBlock=blocks.subList(fromIndex,toIndex);
-            points+=point_per_block(nextBlock);
-            fromIndex++;toIndex++;
-        }
-        delete(tempGameState);
-        return points;
-    }
-
-    private int[] total_points_per_lanes(Car myCar, GameState gameState){
-        int lanesPoint[];
-        lanesPoint = new int[4];
-        int y=myCar.position.lane;
-        int x=myCar.position.block;
-        State carState;
-        // Move forward belum dibikin, nunggu total_point_using_powerups
-        lanesPoint[y]=total_points_in_a_lane(y, x, gameState, carState);
-
-        // check if the car can turn left
-        if (y-1<0){
-            lanesPoint[y]= -999; // sementara kalo gabisa belok kiri pointnya diinisialisasi -999
-        }
-        else {
-            lanesPoint[y]=total_points_in_a_lane(y-1, x, gameState, TURN_LEFT);
-        }
-
-        // check if the car can turn right
-        if (y+1>=4){
-            lanesPoint[y]= -999; // sementara kalo gabisa belok kanan pointnya diinisialisasi -999
-        }
-        else {
-            lanesPoint[y]=total_points_in_a_lane(y+1, x, gameState, TURN_RIGHT);
-        }
-        return lanesPoint;
-    }
+    
     private Boolean hasPowerUp(PowerUps powerUpToCheck, PowerUps[] available) {
         for (PowerUps powerUp: available) {
             if (powerUp.equals(powerUpToCheck)) {
@@ -278,15 +263,141 @@ public class Bot {
 
     /**
      * Returns map of blocks and the objects in the for the current lanes, returns
-     * the amount of blocks that can be traversed at current speed.
+     * the amount of blocks that can be traversed at max speed.
      **/
-    private List<Object> getBlocksInFront(int lane, int block, GameState gameState, int speed) {
+
+
+    private List<Integer> getPointsOfAllLane(List<Integer> power_ups_points, GameState gameState){
+        Car myCar=gameState.player;
+        int currLane=myCar.position.lane;
+        int currBlock=myCar.position.block;
+        int speedIf;
+        
+        List<Object> blocks=getBlocksInFront(currLane, currBlock, gameState);
+        List<Integer> pointsPerLane;
+        // List to store points per lane
+        List<Integer> lanePoints = Arrays.asList(-999, -999, -999, -999);
+
+        // Calculate points if car turns left
+        if (currLane-1>0){
+            int leftLane = currLane - 1;
+            speedIf = current_speed_if(myCar, TURN_LEFT);
+            pointsPerLane = getNumOfBlockInFront(leftLane, currBlock, speedIf, gameState);
+            lanePoints.set(0, getPointsFromList(pointsPerLane));
+        }
+        // Calculate points if car turns right
+        if (currLane+1 <= gameState.lanes.size()){
+            int rightLane = currLane+1;
+            speedIf = current_speed_if(myCar, TURN_RIGHT);
+            pointsPerLane = getNumOfBlockInFront(rightLane, currBlock, speedIf, gameState);
+            lanePoints.set(2, getPointsFromList(pointsPerLane));
+        }
+
+        // Calculate if car moves forward
+        int choosedLane;
+        if (power_ups_points.get(1)!=null){
+            speedIf=current_speed_if(myCar, use_powerups(power_ups_points.get(1)));
+            choosedLane = 3;
+        }
+        else{
+            speedIf=current_speed_if(myCar, ACCELERATE);
+            choosedLane = 1;
+        }
+        pointsPerLane=getNumOfBlockInFront(currLane, currBlock, speedIf, gameState);
+        lanePoints.set(choosedLane, getPointsFromList(pointsPerLane));
+
+        return lanePoints;
+    }
+
+    private Command choosingLane(List<Integer> lane_points, List<Integer> power_ups_points, GameState gameState){
+        //Check max score
+        int maxPoint = Collections.max(lane_points);
+        int lane = lane_points.indexOf(maxPoint);
+
+        if (lane == 0){
+            return  TURN_LEFT;
+        }
+        else if (lane == 2) {
+            return TURN_RIGHT;
+        }
+        else if(lane == 1){
+            return ACCELERATE;
+        }
+        else if(gameState.player.state != State.USED_BOOST){
+            return use_powerups(power_ups_points.get(1));
+        }
+
+        return ACCELERATE;
+    }
+
+    // to calculate total points from list getNumInFront
+    private int getPointsFromList(List<Integer> pointsPerLane){ 
+        int points=0;
+        points+=pointsPerLane.get(0)*(-3); //MUD
+        points+=pointsPerLane.get(1)*(-3); //OIL SPILL
+        points+=pointsPerLane.get(2)*(3); // OIL POWER
+        points+=pointsPerLane.get(4)*(5); //BOOST
+        points+=pointsPerLane.get(5)*(-5); //WALL
+        points+=pointsPerLane.get(6)*(3); //LIZARD       
+        points+=pointsPerLane.get(7)*(3); // TWEET
+        points+=pointsPerLane.get(8)*(5); //EMP
+        return points;
+    }
+
+    private List<Integer> getNumOfBlockInFront(int pos_lane, int pos_block, int currSpeed, GameState gameState){
+        //Game and player state
+        Car myCar = gameState.player;
+        List<Object> blocks = getBlocksInFront(pos_lane, pos_block, gameState); //bisa tambahin parameter currspeed nnti
+
+        //Number of each block
+        List<Integer> NumOfBlockInFront = Arrays.asList(0, 0, 0, 0, 0, 0, 0, 0, 0);
+
+        // Itterate through each blocl
+        // cant use swithc case, bcs we comparing objects
+        for (Object block : blocks) {
+            if (block == Terrain.MUD) {
+                NumOfBlockInFront.set(0, NumOfBlockInFront.get(0) + 1);
+            }
+            else if (block == Terrain.OIL_SPILL) {
+                NumOfBlockInFront.set(1, NumOfBlockInFront.get(1) + 1);
+            }
+            else if (block == Terrain.OIL_POWER) {
+                NumOfBlockInFront.set(2, NumOfBlockInFront.get(2) + 1);
+            }
+            else if (block == Terrain.FINISH) {
+                NumOfBlockInFront.set(3, NumOfBlockInFront.get(3) + 1);
+            }
+            else if (block == Terrain.BOOST) {
+                NumOfBlockInFront.set(4, NumOfBlockInFront.get(4) + 1);
+            }
+            else if (block == Terrain.WALL) {
+                NumOfBlockInFront.set(5, NumOfBlockInFront.get(5) + 1);
+            }
+            else if (block == Terrain.LIZARD) {
+                NumOfBlockInFront.set(6, NumOfBlockInFront.get(6) + 1);
+            }
+            else if (block == Terrain.TWEET) {
+                NumOfBlockInFront.set(7, NumOfBlockInFront.get(7) + 1);
+            }
+            else if (block == Terrain.EMP) {
+                NumOfBlockInFront.set(8, NumOfBlockInFront.get(8) + 1);
+            }
+        }
+
+        return  NumOfBlockInFront;
+    }
+
+    private List<Object> getBlocksInFront(int lane, int block, GameState gameState) {
+        //Current Speed
+        int currSpeed = gameState.player.speed;
+
+        //Current map condition
         List<Lane[]> map = gameState.lanes;
         List<Object> blocks = new ArrayList<>();
         int startBlock = map.get(0)[0].position.block;
 
-        Lane[] laneList = map.get(lane - 1);
-        for (int i = max(block - startBlock, 0); i <= block - startBlock + speed; i++) {
+        Lane[] laneList = map.get(lane-1);
+        for (int i = max(block - startBlock, 1); i <= block - startBlock + currSpeed; i++) {
             if (laneList[i] == null || laneList[i].terrain == Terrain.FINISH) {
                 break;
             }
@@ -296,5 +407,4 @@ public class Bot {
         }
         return blocks;
     }
-
 }
