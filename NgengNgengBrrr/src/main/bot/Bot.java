@@ -14,6 +14,7 @@ import static java.lang.Math.abs;
 public class Bot {
 
     private static final int maxSpeed = 9;
+    private List<Command> directionList = new ArrayList<>();
 
     private static final int MINIMUM_SPEED = 0;
     private static final int SPEED_STATE_1 = 3;
