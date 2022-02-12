@@ -34,7 +34,7 @@ public class Bot {
     private final static Command BOOST = new BoostCommand();
     private final static Command EMP = new EmpCommand();
     private final static Command FIX = new FixCommand();
-    private final static Command TWEET = new TweetCommand();
+    private static Command TWEET_COMMAND;
 
     private final static Command TURN_RIGHT = new ChangeLaneCommand(1);
     private final static Command TURN_LEFT = new ChangeLaneCommand(-1);
@@ -62,7 +62,13 @@ public class Bot {
 
         //Check power-ups
         //Cek juga ga lagi ngeboost/power up lain
-        return COMMAND;
+        if (COMMAND == TWEET_COMMAND){
+            return new TweetCommand(3,6) ; //nilai x dan y
+        }
+        else
+        {
+            return COMMAND;
+        }
     }
 
     // BASIC DAMAGE CHECK
@@ -116,7 +122,7 @@ public class Bot {
                 }
                 break;
             case TWEET:
-
+                point = 7;
                 break;
             case LIZARD:
                 speedIf = current_speed_if(myCar, LIZARD);
@@ -173,6 +179,8 @@ public class Bot {
         points_using_powerups.add(total_point_using_powerups(PowerUps.OIL, gameState));
         //Points from LIZARD
         points_using_powerups.add(total_point_using_powerups(PowerUps.LIZARD, gameState));
+        //Point from TWEET
+        points_using_powerups.add(total_point_using_powerups(PowerUps.TWEET, gameState));
 
         //Looking for best powerups
         int max_points = 0, command = 0;
@@ -218,6 +226,8 @@ public class Bot {
                 return OIL;
             case 4:
                 return LIZARD;
+            case 5:
+                return TWEET_COMMAND;
             default:
                 return ACCELERATE;
         }
