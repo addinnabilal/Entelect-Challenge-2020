@@ -14,7 +14,15 @@ import static java.lang.Math.abs;
 public class Bot {
 
     private static final int maxSpeed = 9;
-    private List<Command> directionList = new ArrayList<>();
+
+    private static final int MINIMUM_SPEED = 0;
+    private static final int SPEED_STATE_1 = 3;
+    private static final int INITIAL_SPEED = 5;
+    private static final int SPEED_STATE_2 = 6;
+    private static final int SPEED_STATE_3 = 8;
+    private static final int MAXIMUM_SPEED = 9;
+    private static final int BOOST_SPEED = 15;
+    List<Integer> SPEEDS = Arrays.asList(MINIMUM_SPEED, SPEED_STATE_1, INITIAL_SPEED, SPEED_STATE_2, SPEED_STATE_3, MAXIMUM_SPEED);
 
     private final Random random;
 
@@ -203,8 +211,14 @@ public class Bot {
 
         //Return best powerups
         List<Integer> powerups_to_use = new ArrayList<Integer>();
-        powerups_to_use.add(max_points);
-        powerups_to_use.add(command);
+        if (max_points==0 && command==points_using_powerups.size()){
+            powerups_to_use.add(null);
+            powerups_to_use.add(null);
+        }
+        else{
+            powerups_to_use.add(max_points);
+            powerups_to_use.add(command);
+        }
 
         return  powerups_to_use;
     }
@@ -257,6 +271,28 @@ public class Bot {
         return  maxSpeed;
     }
 
+    private int current_speed_if(Car myCar, Command command){
+        int currSpeed, maxSpeed=max_speed_check(myCar);
+        if (command==ACCELERATE){
+            if (myCar.speed != maxSpeed && myCar.speed != BOOST_SPEED) {
+                currSpeed = SPEEDS.get(SPEEDS.indexOf(myCar.speed) + 1);
+            }
+            else {
+                currSpeed=myCar.speed;
+            }
+        }
+        else if (command==TURN_LEFT || command==TURN_RIGHT){
+            currSpeed=myCar.speed-1;
+        }
+        else if(command==BOOST){
+            currSpeed=15;
+        }
+        else{
+            currSpeed=myCar.speed;
+        }
+        return currSpeed;
+    }
+    
     private Boolean hasPowerUp(PowerUps powerUpToCheck, PowerUps[] available) {
         for (PowerUps powerUp: available) {
             if (powerUp.equals(powerUpToCheck)) {
@@ -291,10 +327,62 @@ public class Bot {
         return blocks;
     }
 
-    private List<Integer> getNumOfBlockInFront(int currSpeed, GameState gameState){
+    private List<Integer> getPointsOfAllLane(GameState gameState){
+        Car myCar=gameState.player;
+        int currLane=myCar.position.lane;
+        int currBlock=myCar.position.block;
+        int speedIf;
+        
+        List<Object> blocks=getBlocksInFront(currLane, currBlock, gameState);
+        List<Integer> pointsPerLane;
+        // List to store points per lane
+        List<Integer> lanePoints = new ArrayList<Integer>(gameState.lanes.size());
+
+        // Calculate points if car turns left
+        if (currLane-1>=0){
+            int leftLane=currLane-1;
+            speedIf=current_speed_if(myCar, TURN_LEFT);
+            pointsPerLane=getNumOfBlockInFront(leftLane, currBlock, speedIf, gameState);
+            lanePoints.set(leftLane, getPointsFromList(pointsPerLane));
+        }
+        // Calculate points if car turns right
+        if (currLane+1<gameState.lanes.size()){
+            int rightLane=currLane+1;
+            speedIf=current_speed_if(myCar, TURN_RIGHT);
+            pointsPerLane=getNumOfBlockInFront(rightLane, currBlock, speedIf, gameState);
+            lanePoints.set(rightLane, getPointsFromList(pointsPerLane));
+        }
+        // Calculate if car moves forward
+        List<Integer> power_ups_points=get_total_points_using_powerups(gameState, blocks);
+        if (power_ups_points.get(1)!=null){
+            speedIf=current_speed_if(myCar, use_powerups(power_ups_points.get(1)));
+        }
+        else{
+            speedIf=current_speed_if(myCar, ACCELERATE);
+        }
+        pointsPerLane=getNumOfBlockInFront(currLane, currBlock, speedIf, gameState);
+        lanePoints.set(currLane, getPointsFromList(pointsPerLane));
+
+        return lanePoints;
+    }
+    
+    // to calculate total points from list getNumInFront
+    private int getPointsFromList(List<Integer> pointsPerLane){ 
+        int points=0;
+        points+=pointsPerLane.get(0)*(-3); //MUD
+        points+=pointsPerLane.get(1)*(-3); //OIL SPILL
+        points+=pointsPerLane.get(2)*(3); // OIL POWER
+        points+=pointsPerLane.get(4)*(5); //BOOST
+        points+=pointsPerLane.get(5)*(-5); //WALL
+        points+=pointsPerLane.get(6)*(3); //LIZARD       
+        points+=pointsPerLane.get(7)*(3); // TWEET
+        points+=pointsPerLane.get(8)*(5); //EMP
+        return points;
+    }
+    private List<Integer> getNumOfBlockInFront(int pos_lane, int pos_block, int currSpeed, GameState gameState){
         //Game and player state
         Car myCar = gameState.player;
-        List<Object> blocks = getBlocksInFront(myCar.position.lane, myCar.position.block, gameState); //bisa tambahin parameter currspeed nnti
+        List<Object> blocks = getBlocksInFront(pos_lane, pos_block, gameState); //bisa tambahin parameter currspeed nnti
 
         //Number of each block
         List<Integer> NumOfBlockInFront = Arrays.asList(0, 0, 0, 0, 0, 0, 0, 0, 0);
