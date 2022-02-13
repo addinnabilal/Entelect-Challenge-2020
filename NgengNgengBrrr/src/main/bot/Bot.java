@@ -71,11 +71,7 @@ public class Bot {
         //Check power-ups
         //Cek juga ga lagi ngeboost/power up lain
         if (COMMAND == TWEET_COMMAND){
-<<<<<<< HEAD
-            return new TweetCommand(opponent.position.lane, opponent.position.block + opponent.speed) ; //nilai x dan y
-=======
             return new TweetCommand(opponent.position.lane,opponent.position.block + opponent.speed ) ; //nilai x dan y
->>>>>>> 2b0890ca20720dace2525206876090fe0cad5bdc
         }
         else
         {
