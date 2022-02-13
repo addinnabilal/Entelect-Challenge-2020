@@ -63,7 +63,7 @@ public class Bot {
         //Check power-ups
         //Cek juga ga lagi ngeboost/power up lain
         if (COMMAND == TWEET_COMMAND){
-            return new TweetCommand(3,6) ; //nilai x dan y
+            return new TweetCommand(opponent.position.lane, opponent.position.block + opponent.speed) ; //nilai x dan y
         }
         else
         {
