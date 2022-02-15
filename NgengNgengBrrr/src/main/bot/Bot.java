@@ -1,6 +1,6 @@
 package main.bot;
 
-import com.sun.org.apache.xpath.internal.operations.Bool;
+// import com.sun.org.apache.xpath.internal.operations.Bool;
 import main.bot.command.*;
 import main.bot.entities.*;
 import main.bot.enums.State;
@@ -84,6 +84,7 @@ public class Bot {
         int maxSpeed = max_speed_check(myCar);
 
         return myCar.speed == maxSpeed && (maxSpeed < 8 || (hasPowerUp(PowerUps.BOOST, myCar.powerups)));
+
     }
 
     //USING POWER UP AND CHECKING POWERUPS POINT
@@ -111,13 +112,14 @@ public class Bot {
             case EMP:
                 diff = abs(opponent.position.lane - myCar.position.lane);
                 if ( diff <= 1 && opponent.position.block > myCar.position.block ) {
-                    point = 8;
+                    // point = 8;
+                    point=3;
                 }
                 break;
             case BOOST:
                 speedIf = current_speed_if(myCar, BOOST);
                 blocks = getBlocksInFront(myCar.position.lane, myCar.position.block, gameState, speedIf);
-                if (!(blocks.containsAll(obstacles)) && myCar.damage == 0)
+                if (myCar.damage == 0)
                 {
                     point = 10;
                 }
@@ -126,7 +128,8 @@ public class Bot {
                 diff = abs(opponent.position.block - myCar.position.block);
                 if (myCar.position.lane == opponent.position.lane && diff <= opponent.speed)
                 {
-                    point = 5;
+                    // point = 5;
+                    point=3;
                 }
                 break;
             case TWEET:
@@ -331,7 +334,8 @@ public class Bot {
         //Membatasi Jumlah Powerups
         if (numOfPowerups.get(0) < 0)
         {
-            point += pointsPerLane.get(2)*(3);  // OIL POWER
+            // point += pointsPerLane.get(2)*(3);  // OIL POWER
+            point += pointsPerLane.get(2)*(2);  // OIL POWER
         }
         if (numOfPowerups.get(1) < 5)
         {
@@ -350,12 +354,12 @@ public class Bot {
             point += pointsPerLane.get(8)*(4);  //EMP
         }
 
-        point += pointsPerLane.get(0)*(-3); //MUD
-        point += pointsPerLane.get(1)*(-3); //OIL SPILL
+        point += pointsPerLane.get(0)*(-5); //MUD
+        point += pointsPerLane.get(1)*(-5); //OIL SPILL
         point += pointsPerLane.get(5)*(-5); //WALL
 
-        obstacle += pointsPerLane.get(0)*(-3); //MUD
-        obstacle += pointsPerLane.get(1)*(-3); //OIL SPILL
+        obstacle += pointsPerLane.get(0)*(-5); //MUD
+        obstacle += pointsPerLane.get(1)*(-5); //OIL SPILL
         obstacle += pointsPerLane.get(5)*(-5); //WALL
 
         points.set(0, point);
@@ -371,8 +375,8 @@ public class Bot {
         int currBlock=myCar.position.block;
         int speedIf;
         int TURNING_POINT_REDUCTION = -1;
-        int ACCELERATE_POINT_BONUS = 4;
-        int BOOSTING_POINT_BONUS = 20;
+        int ACCELERATE_POINT_BONUS = 10;
+        int BOOSTING_POINT_BONUS = 25;
         int bonus_point;
         Boolean isBoosting = (myCar.speed == 15);
 
@@ -392,8 +396,8 @@ public class Bot {
             pointsPerLane = getNumOfBlockInFront(leftLane, currBlock-1, speedIf, gameState);
             //Check if boosting and no obstacle ahead
             if (isBoosting && pointsPerLane.get(1) == 0){
-                bonus_point += BOOSTING_POINT_BONUS;
-            }
+                 bonus_point += BOOSTING_POINT_BONUS;
+             }
             bonus_point += TURNING_POINT_REDUCTION;
             lanePoints.set(0, getPointsFromList(pointsPerLane, numOfPowerup).get(0) + bonus_point);
         }
@@ -406,7 +410,8 @@ public class Bot {
             //Check if boosting and no obstacle ahead
             if (isBoosting && pointsPerLane.get(1) == 0){
                 bonus_point += BOOSTING_POINT_BONUS;
-            }
+             }
+
             bonus_point += TURNING_POINT_REDUCTION;
             lanePoints.set(2, getPointsFromList(pointsPerLane, numOfPowerup).get(0) + bonus_point);
         }
@@ -433,6 +438,7 @@ public class Bot {
         if (isBoosting && pointsPerLane.get(1) == 0){
             bonus_point += BOOSTING_POINT_BONUS;
         }
+
         lanePoints.set(choosedLane, getPointsFromList(pointsPerLane, numOfPowerup).get(0) + bonus_point);
 
         return lanePoints;
