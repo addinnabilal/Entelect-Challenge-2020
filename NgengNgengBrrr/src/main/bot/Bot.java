@@ -360,7 +360,7 @@ public class Bot {
             point += pointsPerLane.get(8)*(3);  //EMP
         }
 
-        point += pointsPerLane.get(0)*(-12); //MUD
+        point += pointsPerLane.get(0)*(-9); //MUD
         point += pointsPerLane.get(1)*(-9); //OIL SPILL
         point += pointsPerLane.get(5)*(-14); //WALL
         point += pointsPerLane.get(9)*(-12); //Enemy
@@ -539,7 +539,7 @@ public class Bot {
         int startBlock = map.get(0)[0].position.block;
 
         Lane[] laneList = map.get(lane-1);
-        for (int i = max(block - startBlock+1, 0); i <= block - startBlock + currSpeed; i++) {
+        for (int i = max(block - startBlock + 1, 0); i <= block - startBlock + currSpeed; i++) {
             if (laneList[i] == null || laneList[i].terrain == Terrain.FINISH) {
                 break;
             }
