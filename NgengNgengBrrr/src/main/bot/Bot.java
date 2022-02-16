@@ -1,6 +1,5 @@
 package main.bot;
 
-import com.sun.org.apache.xpath.internal.operations.Bool;
 import main.bot.command.*;
 import main.bot.entities.*;
 import main.bot.enums.State;
@@ -54,12 +53,20 @@ public class Bot {
         List<Integer> power_ups_points = get_total_points_using_powerups(gameState);
         List<Integer> lane_points = getPointsOfAllLane(power_ups_points, gameState);
         Command COMMAND = choosingLane(lane_points, power_ups_points, gameState);
-
+        
+        if (checkTruckInFront(gameState,myCar.speed)){
+            if(myCar.position.lane == 1){
+                return TURN_RIGHT;
+            }
+            return TURN_LEFT;
+        }
         //Check damage
         if (myCar.damage>0 && (damage_check(gameState) && myCar.speed < 15))
         {
             return FIX;
         }
+
+
 
         //Check speed
         if (myCar.speed == 0)
@@ -550,5 +557,24 @@ public class Bot {
         return blocks;
     }
 
+    private boolean checkTruckInFront(GameState gameState, int currSpeed){
+        //Current map condition
+        Car myCar = gameState.player;
+        List<Lane[]> map = gameState.lanes;
+        int startBlock = map.get(0)[0].position.block;
+        int block = myCar.position.block;
 
+        Lane[] laneList = map.get(myCar.position.lane-1);
+        for (int i = max(block - startBlock - 1, 0); i <= block - startBlock + currSpeed; i++) {
+            if (laneList[i] == null || laneList[i].terrain == Terrain.FINISH) {
+                break;
+            }
+
+            if (laneList[i].isOccupiedByCyberTruck)
+            {
+                return true;
+            }
+        }
+        return false;
+    }
 }
