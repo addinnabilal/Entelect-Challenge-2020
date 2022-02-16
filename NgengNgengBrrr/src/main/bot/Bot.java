@@ -53,32 +53,24 @@ public class Bot {
         List<Integer> power_ups_points = get_total_points_using_powerups(gameState);
         List<Integer> lane_points = getPointsOfAllLane(power_ups_points, gameState);
         Command COMMAND = choosingLane(lane_points, power_ups_points, gameState);
-        
-        if (checkTruckInFront(gameState,myCar.speed)){
-            if(myCar.position.lane == 1){
-                return TURN_RIGHT;
-            }
-            return TURN_LEFT;
-        }
+
         //Check damage
         if (myCar.damage>0 && (damage_check(gameState) && myCar.speed < 15))
         {
             return FIX;
         }
 
-
-
         //Check speed
         if (myCar.speed == 0)
         {
-
             return  ACCELERATE;
         }
 
         //Check power-ups
         //Cek juga ga lagi ngeboost/power up lain
         if (COMMAND == TWEET_COMMAND){
-            return new TweetCommand(opponent.position.lane,opponent.position.block + opponent.speed ) ; //nilai x dan y
+            int randomLane = getRandomNumber(-1,1);
+            return new TweetCommand(randomLane,opponent.position.block + opponent.speed ) ; //nilai x dan y
         }
         else
         {
@@ -94,6 +86,11 @@ public class Bot {
         int numOfBoost = numofPowerUps.get(1);
 
         return (myCar.speed == maxSpeed && (maxSpeed < 8 || (numOfBoost > 0)));
+    }
+
+    //Random Lane
+    private int getRandomNumber(int min, int max) {
+        return (int) ((Math.random() * (max - min)) + min);
     }
 
     //USING POWER UP AND CHECKING POWERUPS POINT
@@ -136,8 +133,7 @@ public class Bot {
                 }
                 break;
             case TWEET:
-                blocks = getBlocksInFront(myCar.position.lane, myCar.position.block, gameState, opponent.speed);
-                if (opponent.speed > 6 && myCar.speed > 8 && !(contains_obstacle(blocks)))
+                if (opponent.speed > 6 && myCar.speed > 8)
                 {
                     point = 5;
                 }
@@ -185,7 +181,6 @@ public class Bot {
     }
 
     private Boolean contains_obstacle(List<Object> blocks){
-
         return blocks.contains(Terrain.MUD) || blocks.contains(Terrain.OIL_SPILL) || blocks.contains(Terrain.WALL);
     }
     private List<Integer> get_total_points_using_powerups(GameState gameState){
