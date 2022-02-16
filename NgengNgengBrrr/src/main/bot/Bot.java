@@ -56,7 +56,7 @@ public class Bot {
         Command COMMAND = choosingLane(lane_points, power_ups_points, gameState);
 
         //Check damage
-        if (damage_check(myCar) && myCar.speed < 15)
+        if (myCar.damage>0 && (damage_check(gameState) && myCar.speed < 15))
         {
             return FIX;
         }
@@ -80,10 +80,13 @@ public class Bot {
     }
 
     // BASIC DAMAGE CHECK
-    private boolean damage_check(Car myCar){
+    private boolean damage_check(GameState gameState){
+        Car myCar = gameState.player;
         int maxSpeed = max_speed_check(myCar);
+        List<Integer> numofPowerUps = getNumofPowerUps(gameState); //Jumlah boost == 1 baru difix
+        int numOfBoost = numofPowerUps.get(1);
 
-        return myCar.speed == maxSpeed && (maxSpeed < 8 || (hasPowerUp(PowerUps.BOOST, myCar.powerups)));
+        return (myCar.speed == maxSpeed && (maxSpeed < 8 || (numOfBoost == 1)));
     }
 
     //USING POWER UP AND CHECKING POWERUPS POINT
@@ -93,6 +96,8 @@ public class Bot {
         Car opponent = gameState.opponent;
         int speedIf;
         List<Object> blocks;
+        List<Integer> numofPowerUps = getNumofPowerUps(gameState);
+
 
         //List all obstacles
         List<Object> obstacles = new ArrayList<>();
@@ -110,27 +115,29 @@ public class Bot {
         switch (powerUpToCheck) {
             case EMP:
                 diff = abs(opponent.position.lane - myCar.position.lane);
-                if ( diff <= 1 && opponent.position.block > myCar.position.block ) {
+                if ( opponent.speed > 3 && diff <= 1 && opponent.position.block > myCar.position.block ) {
                     point = 8;
                 }
                 break;
             case BOOST:
-                speedIf = current_speed_if(myCar, BOOST);
-                blocks = getBlocksInFront(myCar.position.lane, myCar.position.block, gameState, speedIf);
+                blocks = getBlocksInFront(myCar.position.lane, myCar.position.block, gameState, 15);
                 if (!(blocks.containsAll(obstacles)) && myCar.damage == 0)
                 {
-                    point = 10;
+                    //Only have 1 boost and no obstacle
+                    point = 15;
                 }
                 break;
             case OIL:
-                diff = abs(opponent.position.block - myCar.position.block);
-                if (myCar.position.lane == opponent.position.lane && diff <= opponent.speed)
+                if (myCar.position.lane == opponent.position.lane && opponent.position.block < myCar.position.block)
                 {
-                    point = 5;
+                    point = 2;
                 }
                 break;
             case TWEET:
-                point = 5;
+                if (opponent.speed > 6 && myCar.speed > 8)
+                {
+                    point = 5;
+                }
                 break;
             case LIZARD:
                 speedIf = current_speed_if(myCar, LIZARD);
@@ -142,7 +149,6 @@ public class Bot {
 
                 if (!(landingBlocks.containsAll(obstacles)))
                 {
-                    point = 3;
 
                     //List all object
                     List<Integer> allObstacles = getNumOfBlockInFront(3, currBlock, 0, gameState);
@@ -152,7 +158,7 @@ public class Bot {
                         //Mengandung MUD/OILSPILL/WALL
                         if (Arrays.asList(0, 1, 5).contains(i)) //ekuivalen sama (if i in [0, 1, 5])
                         {
-                            point += allObstacles.get(i);
+                            point += allObstacles.get(i) * 3;
                         }
                         //Mengandung POWER UP
                         if (Arrays.asList(2, 4, 6, 7, 8).contains(i))
@@ -302,7 +308,11 @@ public class Bot {
 
     private int current_speed_if(Car myCar, Command command){
         int currSpeed, maxSpeed = max_speed_check(myCar);
-        if (command==ACCELERATE){
+        if (myCar.speed == 15)
+        {
+            currSpeed = 15;
+        }
+        else if (command==ACCELERATE){
             if (myCar.speed < maxSpeed && myCar.speed != 9) {
                 currSpeed = SPEEDS.get(SPEEDS.indexOf(myCar.speed)+1);
             }
@@ -331,32 +341,35 @@ public class Bot {
         //Membatasi Jumlah Powerups
         if (numOfPowerups.get(0) < 0)
         {
-            point += pointsPerLane.get(2)*(3);  // OIL POWER
+            point += pointsPerLane.get(2)*(1);  // OIL POWER
         }
         if (numOfPowerups.get(1) < 5)
         {
-            point += pointsPerLane.get(4)*(5);  //BOOST
+            point += pointsPerLane.get(4)*(15);  //BOOST
         }
         if (numOfPowerups.get(2) < 3)
         {
-            point += pointsPerLane.get(6)*(3);  //LIZARD
+            point += pointsPerLane.get(6)*(2);  //LIZARD
         }
         if (numOfPowerups.get(3) < 3)
         {
-            point += pointsPerLane.get(7)*(3);  // TWEET
+            point += pointsPerLane.get(7)*(2);  // TWEET
         }
         if (numOfPowerups.get(4) < 2)
         {
-            point += pointsPerLane.get(8)*(4);  //EMP
+            point += pointsPerLane.get(8)*(3);  //EMP
         }
 
-        point += pointsPerLane.get(0)*(-3); //MUD
-        point += pointsPerLane.get(1)*(-3); //OIL SPILL
-        point += pointsPerLane.get(5)*(-5); //WALL
+        point += pointsPerLane.get(0)*(-7); //MUD
+        point += pointsPerLane.get(1)*(-7); //OIL SPILL
+        point += pointsPerLane.get(5)*(-9); //WALL
+        point += pointsPerLane.get(9)*(-12); //Enemy
+        point += pointsPerLane.get(10)*(2) ; //Empty block
 
-        obstacle += pointsPerLane.get(0)*(-3); //MUD
-        obstacle += pointsPerLane.get(1)*(-3); //OIL SPILL
-        obstacle += pointsPerLane.get(5)*(-5); //WALL
+        obstacle += pointsPerLane.get(0)*(-7); //MUD
+        obstacle += pointsPerLane.get(1)*(-7); //OIL SPILL
+        obstacle += pointsPerLane.get(5)*(-9); //WALL
+        obstacle += pointsPerLane.get(9)*(-12); //Enemy
 
         points.set(0, point);
         points.set(1, obstacle);
@@ -390,12 +403,12 @@ public class Bot {
             int leftLane = currLane - 1;
             speedIf = current_speed_if(myCar, TURN_LEFT);
             pointsPerLane = getNumOfBlockInFront(leftLane, currBlock-1, speedIf, gameState);
-            //Check if boosting and no obstacle ahead
-            if (isBoosting && pointsPerLane.get(1) == 0){
+            bonus_point += TURNING_POINT_REDUCTION;
+            if (isBoosting && getPointsFromList(pointsPerLane, numOfPowerup).get(1) == 0)
+            {
                 bonus_point += BOOSTING_POINT_BONUS;
             }
-            bonus_point += TURNING_POINT_REDUCTION;
-            lanePoints.set(0, getPointsFromList(pointsPerLane, numOfPowerup).get(0) + bonus_point);
+            lanePoints.set(1, getPointsFromList(pointsPerLane, numOfPowerup).get(0) + bonus_point);
         }
         // Calculate points if car turns right
         if (currLane+1 <= gameState.lanes.size()){
@@ -403,11 +416,11 @@ public class Bot {
             int rightLane = currLane+1;
             speedIf = current_speed_if(myCar, TURN_RIGHT);
             pointsPerLane = getNumOfBlockInFront(rightLane, currBlock-1, speedIf, gameState);
-            //Check if boosting and no obstacle ahead
-            if (isBoosting && pointsPerLane.get(1) == 0){
+            bonus_point += TURNING_POINT_REDUCTION;
+            if (isBoosting && getPointsFromList(pointsPerLane, numOfPowerup).get(1) == 0)
+            {
                 bonus_point += BOOSTING_POINT_BONUS;
             }
-            bonus_point += TURNING_POINT_REDUCTION;
             lanePoints.set(2, getPointsFromList(pointsPerLane, numOfPowerup).get(0) + bonus_point);
         }
 
@@ -422,15 +435,15 @@ public class Bot {
         }
         // Accelerating
         speedIf = current_speed_if(myCar, ACCELERATE);
-        choosedLane = 1;
+        choosedLane = 0;
         bonus_point = 0;
         pointsPerLane=getNumOfBlockInFront(currLane, currBlock, speedIf, gameState);
         if (getPointsFromList(pointsPerLane, numOfPowerup).get(1) == 0)
         {
             bonus_point += ACCELERATE_POINT_BONUS; //accelerate success when doesn't hit by obstacle
         }
-        //Check if boosting and no obstacle ahead
-        if (isBoosting && pointsPerLane.get(1) == 0){
+        if (isBoosting && getPointsFromList(pointsPerLane, numOfPowerup).get(1) == 0)
+        {
             bonus_point += BOOSTING_POINT_BONUS;
         }
         lanePoints.set(choosedLane, getPointsFromList(pointsPerLane, numOfPowerup).get(0) + bonus_point);
@@ -443,13 +456,13 @@ public class Bot {
         int maxPoint = Collections.max(lane_points);
         int lane = lane_points.indexOf(maxPoint);
 
-        if (lane == 0){
+        if (lane == 1){
             return  TURN_LEFT;
         }
         else if (lane == 2) {
             return TURN_RIGHT;
         }
-        else if(lane == 1){
+        else if(lane == 0){
             return ACCELERATE;
         }
         else if(gameState.player.speed < 15){
@@ -463,11 +476,18 @@ public class Bot {
     private List<Integer> getNumOfBlockInFront(int pos_lane, int pos_block, int currSpeed, GameState gameState){
         //Game and player state
         Car myCar = gameState.player;
+        Car opponent = gameState.opponent;
         List<Object> blocks = getBlocksInFront(pos_lane, pos_block, gameState, currSpeed);
 
         //Number of each block
-        List<Integer> NumOfBlockInFront = Arrays.asList(0, 0, 0, 0, 0, 0, 0, 0, 0);
+        List<Integer> NumOfBlockInFront = Arrays.asList(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
 
+        if (myCar.position.lane == opponent.position.lane &&
+                myCar.position.block < opponent.position.block &&
+                myCar.position.block + currSpeed > opponent.position.block )
+        {
+            NumOfBlockInFront.set(9, 1);
+        }
         // Itterate through each blocl
         // cant use swithc case, bcs we comparing objects
         for (Object block : blocks) {
@@ -498,10 +518,15 @@ public class Bot {
             else if (block == Terrain.EMP) {
                 NumOfBlockInFront.set(8, NumOfBlockInFront.get(8) + 1);
             }
+            else if (block == Terrain.EMPTY) {
+                NumOfBlockInFront.set(10, NumOfBlockInFront.get(10) + 1);
+            }
+
         }
 
         return  NumOfBlockInFront;
     }
+
 
     private List<Object> getBlocksInFront(int lane, int block, GameState gameState, int currSpeed) {
         //Current map condition
