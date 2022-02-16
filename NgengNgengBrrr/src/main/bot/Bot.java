@@ -552,24 +552,4 @@ public class Bot {
         return blocks;
     }
 
-    private boolean checkTruckInFront(GameState gameState, int currSpeed){
-        //Current map condition
-        Car myCar = gameState.player;
-        List<Lane[]> map = gameState.lanes;
-        int startBlock = map.get(0)[0].position.block;
-        int block = myCar.position.block;
-
-        Lane[] laneList = map.get(myCar.position.lane-1);
-        for (int i = max(block - startBlock - 1, 0); i <= block - startBlock + currSpeed; i++) {
-            if (laneList[i] == null || laneList[i].terrain == Terrain.FINISH) {
-                break;
-            }
-
-            if (laneList[i].isOccupiedByCyberTruck)
-            {
-                return true;
-            }
-        }
-        return false;
-    }
 }
