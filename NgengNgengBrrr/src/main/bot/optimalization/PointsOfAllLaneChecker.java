@@ -1,17 +1,21 @@
+package main.bot.optimalization;
+
 import main.bot.command.*;
 import main.bot.entities.*;
-import main.bot.enums.State;
-import main.bot.enums.Terrain;
-import main.bot.enums.PowerUps;
-import main.bot.optimalization.*;
 
-import java.security.SecureRandom;
 import java.util.*;
 
-import static java.lang.Math.max;
-import static java.lang.Math.abs;
 
 public class PointsOfAllLaneChecker {
+    public final static Command ACCELERATE = new AccelerateCommand();
+    public final static Command LIZARD = new LizardCommand();
+    public final static Command OIL = new OilCommand();
+    public final static Command BOOST = new BoostCommand();
+    public final static Command EMP = new EmpCommand();
+
+    public final static Command TURN_RIGHT = new ChangeLaneCommand(1);
+    public final static Command TURN_LEFT = new ChangeLaneCommand(-1);
+
     public static List<Integer> getPointsOfAllLane(List<Integer> power_ups_points, GameState gameState){
         Car myCar=gameState.player;
         int currLane=myCar.position.lane;
@@ -48,8 +52,8 @@ public class PointsOfAllLaneChecker {
         if (currLane+1 <= gameState.lanes.size()){
             bonus_point = 0;
             int rightLane = currLane+1;
-            speedIf = conditionCheker.current_speed_if(myCar, TURN_RIGHT);
-            pointsPerLane = blockChecker.getNumOfBlockInFront(rightLane, currBlock-1, speedIf, gameState);
+            speedIf = ConditionChecker.current_speed_if(myCar, TURN_RIGHT);
+            pointsPerLane = BlockChecker.getNumOfBlockInFront(rightLane, currBlock-1, speedIf, gameState);
             bonus_point += TURNING_POINT_REDUCTION;
             if (isBoosting && PointsFromList.getPointsFromList(pointsPerLane, numOfPowerup).get(1) == 0)
             {
@@ -62,14 +66,14 @@ public class PointsOfAllLaneChecker {
         int choosedLane;
         // Using PowerUp
         if (power_ups_points.get(1)!=null){
-            speedIf=current_speed_if(myCar, ConditionChecker.use_powerups(power_ups_points.get(1)));
+            speedIf=ConditionChecker.current_speed_if(myCar, ConditionChecker.use_powerups(power_ups_points.get(1)));
             choosedLane = 3;
-            pointsPerLane=blockChecker.getNumOfBlockInFront(currLane, currBlock, speedIf, gameState);
+            pointsPerLane=BlockChecker.getNumOfBlockInFront(currLane, currBlock, speedIf, gameState);
             if (power_ups_points.get(0)==1 && pointsPerLane.get(1) < 0)
             {
                 pointsPerLane.set(0, 0);
             }
-            lanePoints.set(choosedLane, pointsFromList.getPointsFromList(pointsPerLane, numOfPowerup).get(0) + power_ups_points.get(0));
+            lanePoints.set(choosedLane, PointsFromList.getPointsFromList(pointsPerLane, numOfPowerup).get(0) + power_ups_points.get(0));
         }
         // Accelerating
         speedIf = ConditionChecker.current_speed_if(myCar, ACCELERATE);

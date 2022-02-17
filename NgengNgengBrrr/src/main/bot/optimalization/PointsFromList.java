@@ -1,17 +1,10 @@
-import main.bot.command.*;
-import main.bot.entities.*;
-import main.bot.enums.State;
-import main.bot.enums.Terrain;
-import main.bot.enums.PowerUps;
-import main.bot.optimalization.*;
+package main.bot.optimalization;
 
-import java.security.SecureRandom;
+
 import java.util.*;
 
-import static java.lang.Math.max;
-import static java.lang.Math.abs;
 
-public class pointsFromList {
+public class PointsFromList {
     //LANES POINT CHECKER
     public static List<Integer> getPointsFromList(List<Integer> pointsPerLane, List<Integer> numOfPowerups){
         List<Integer> points = Arrays.asList(0,1);

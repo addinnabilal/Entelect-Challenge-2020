@@ -1,17 +1,12 @@
-import main.bot.command.*;
-import main.bot.entities.*;
-import main.bot.enums.State;
-import main.bot.enums.Terrain;
-import main.bot.enums.PowerUps;
-import main.bot.optimalization.*;
+package main.bot.optimalization;
 
-import java.security.SecureRandom;
+import main.bot.entities.*;
+import main.bot.enums.PowerUps;
+
 import java.util.*;
 
-import static java.lang.Math.max;
-import static java.lang.Math.abs;
 
-public class BestPowerupToUse {
+public class BestPowerupToUseChecker {
     public static List<Integer> get_total_points_using_powerups(GameState gameState){
         //Looking for the best powerups to use, return in 2d array <points,command>
         List<Integer> points_using_powerups = new ArrayList<Integer>();

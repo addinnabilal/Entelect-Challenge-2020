@@ -1,18 +1,20 @@
+package main.bot.optimalization;
+
 import main.bot.command.*;
 import main.bot.entities.*;
-import main.bot.enums.State;
-import main.bot.enums.Terrain;
-import main.bot.enums.PowerUps;
-import main.bot.optimalization.*;
+import main.bot.enums.*;
 
-import java.security.SecureRandom;
 import java.util.*;
 
-import static java.lang.Math.max;
 import static java.lang.Math.abs;
 
 
-public class totalPointUsingPowerupChecker {
+public class TotalPointUsingPowerupChecker {
+    public final static Command LIZARD = new LizardCommand();
+    public final static Command OIL = new OilCommand();
+    public final static Command BOOST = new BoostCommand();
+    public final static Command EMP = new EmpCommand();
+
     //USING POWER UP AND CHECKING POWERUPS POINT
     public static int total_point_using_powerups(PowerUps powerUpToCheck, GameState gameState) {
         //Player & Enemy Car Condition
@@ -41,7 +43,7 @@ public class totalPointUsingPowerupChecker {
                 int lastBlock = gameState.lanes.get(0)[gameState.lanes.get(0).length-1].position.block;
                 int currSpeed = Math.min(lastBlock-currBlockPos,15);
                 blocks = BlockChecker.getBlocksInFront(myCar.position.lane, myCar.position.block, gameState, currSpeed);
-                if (!(contains_obstacle(blocks)) && myCar.damage == 0)
+                if (!(ConditionChecker.contains_obstacle(blocks)) && myCar.damage == 0)
                 {
                     point = 15;
                 }
@@ -53,21 +55,20 @@ public class totalPointUsingPowerupChecker {
                 }
                 break;
             case TWEET:
-                blocks = blockChecker.getBlocksInFront(myCar.position.lane, myCar.position.block, gameState, opponent.speed);
-                if (opponent.speed > 6 && myCar.speed > 8 && !(contains_obstacle(blocks)))
+                if (opponent.speed > 6 && myCar.speed > 8)
                 {
                     point = 5;
                 }
                 break;
             case LIZARD:
-                speedIf = conditionChecker.current_speed_if(myCar, LIZARD);
+                speedIf = ConditionChecker.current_speed_if(myCar, LIZARD);
                 blocks = BlockChecker.getBlocksInFront(myCar.position.lane, myCar.position.block, gameState, speedIf);
 
                 int distanceLeft = gameState.lanes.get(0)[gameState.lanes.get(0).length-1].position.block - myCar.position.block;
                 List<Object> landingBlocks = blocks.subList(0, Math.max(0, Math.min(distanceLeft, myCar.speed)-1));
                 int currBlock=myCar.position.block;
 
-                if (!(contains_obstacle(landingBlocks)))
+                if (!(ConditionChecker.contains_obstacle(landingBlocks)))
                 {
 
                     //List all object
@@ -91,7 +92,7 @@ public class totalPointUsingPowerupChecker {
         }
 
         //Check if player have the powerups
-        if (conditionChecker.hasPowerUp(powerUpToCheck, myCar.powerups))
+        if (ConditionChecker.hasPowerUp(powerUpToCheck, myCar.powerups))
         {
             return point;
         }

@@ -1,17 +1,23 @@
+package main.bot.optimalization;
+
 import main.bot.command.*;
 import main.bot.entities.*;
-import main.bot.enums.State;
-import main.bot.enums.Terrain;
-import main.bot.enums.PowerUps;
-import main.bot.optimalization.*;
 
-import java.security.SecureRandom;
 import java.util.*;
 
-import static java.lang.Math.max;
-import static java.lang.Math.abs;
 
 public class LaneChooser {
+    public final static Command ACCELERATE = new AccelerateCommand();
+    public final static Command LIZARD = new LizardCommand();
+    public final static Command OIL = new OilCommand();
+    public final static Command BOOST = new BoostCommand();
+    public final static Command EMP = new EmpCommand();
+    public final static Command FIX = new FixCommand();
+    public static Command TWEET_COMMAND;
+
+    public final static Command TURN_RIGHT = new ChangeLaneCommand(1);
+    public final static Command TURN_LEFT = new ChangeLaneCommand(-1);
+
     public static Command choosingLane(List<Integer> lane_points, List<Integer> power_ups_points, GameState gameState){
         //Check max score
         int maxPoint = Collections.max(lane_points);

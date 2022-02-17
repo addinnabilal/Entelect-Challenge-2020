@@ -1,17 +1,13 @@
-import main.bot.command.*;
-import main.bot.entities.*;
-import main.bot.enums.State;
-import main.bot.enums.Terrain;
-import main.bot.enums.PowerUps;
-import main.bot.optimalization.*;
+package main.bot.optimalization;
 
-import java.security.SecureRandom;
+import main.bot.entities.*;
+import main.bot.enums.PowerUps;
+
+
 import java.util.*;
 
-import static java.lang.Math.max;
-import static java.lang.Math.abs;
 
-public class numOfPowerupChecker {
+public class NumOfPowerupChecker {
     public static List<Integer> getNumofPowerUps(GameState gameState){
         //Game and player state
         Car myCar = gameState.player;

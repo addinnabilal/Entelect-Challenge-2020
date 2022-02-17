@@ -45,24 +45,20 @@ public class Bot {
         directionList.add(TURN_LEFT);
         directionList.add(TURN_RIGHT);
     }
-
+    private int getRandomNumber(int min, int max) {
+        return (int) ((Math.random() * (max - min)) + min);
+    }
     public Command run(GameState gameState) {
         Car myCar = gameState.player;
         Car opponent = gameState.opponent;
 
         //Basic fix logic
-        List<Integer> power_ups_points = get_total_points_using_powerups(gameState);
-        List<Integer> lane_points = getPointsOfAllLane(power_ups_points, gameState);
-        Command COMMAND = laneChooser.choosingLane(lane_points, power_ups_points, gameState);
-        
-        if (checkTruckInFront(gameState,myCar.speed)){
-            if(myCar.position.lane == 1){
-                return TURN_RIGHT;
-            }
-            return TURN_LEFT;
-        }
+        List<Integer> power_ups_points = BestPowerupToUseChecker.get_total_points_using_powerups(gameState);
+        List<Integer> lane_points = PointsOfAllLaneChecker.getPointsOfAllLane(power_ups_points, gameState);
+        Command COMMAND = LaneChooser.choosingLane(lane_points, power_ups_points, gameState);
+
         //Check damage
-        if (myCar.damage>0 && (damageChecker.damage_check(gameState) && myCar.speed < 15))
+        if (myCar.damage>0 && (DamageChecker.damage_check(gameState) && myCar.speed < 15))
         {
             return FIX;
         }
@@ -70,14 +66,14 @@ public class Bot {
         //Check speed
         if (myCar.speed == 0)
         {
-
             return  ACCELERATE;
         }
 
         //Check power-ups
         //Cek juga ga lagi ngeboost/power up lain
         if (COMMAND == TWEET_COMMAND){
-            return new TweetCommand(opponent.position.lane,opponent.position.block + opponent.speed ) ; //nilai x dan y
+            int randomLane = getRandomNumber(-1,1);
+            return new TweetCommand(randomLane,opponent.position.block + opponent.speed ) ; //nilai x dan y
         }
         else
         {

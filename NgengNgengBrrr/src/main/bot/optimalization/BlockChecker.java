@@ -1,15 +1,10 @@
-import main.bot.command.*;
+package main.bot.optimalization;
 import main.bot.entities.*;
-import main.bot.enums.State;
 import main.bot.enums.Terrain;
-import main.bot.enums.PowerUps;
-import main.bot.optimalization.*;
 
-import java.security.SecureRandom;
 import java.util.*;
 
 import static java.lang.Math.max;
-import static java.lang.Math.abs;
 
 public class BlockChecker {
     
@@ -87,24 +82,4 @@ public class BlockChecker {
         return blocks;
     }
 
-    public static boolean checkTruckInFront(GameState gameState, int currSpeed){
-        //Current map condition
-        Car myCar = gameState.player;
-        List<Lane[]> map = gameState.lanes;
-        int startBlock = map.get(0)[0].position.block;
-        int block = myCar.position.block;
-
-        Lane[] laneList = map.get(myCar.position.lane-1);
-        for (int i = max(block - startBlock - 1, 0); i <= block - startBlock + currSpeed; i++) {
-            if (laneList[i] == null || laneList[i].terrain == Terrain.FINISH) {
-                break;
-            }
-
-            if (laneList[i].isOccupiedByCyberTruck)
-            {
-                return true;
-            }
-        }
-        return false;
-    }
 }
