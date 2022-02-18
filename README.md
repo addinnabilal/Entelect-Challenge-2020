@@ -3,7 +3,7 @@
 
 ## Table of Contents
 * [General Info](#general-information)
-* [Technologies Used](#technologies-used)
+* [Setup](#setup)
 * [Usage](#usage)
 * [Project Status](#project-status)
 * [Acknowledgements](#acknowledgements)
@@ -15,17 +15,25 @@
 Repositori ini merupakan pemenuhan tugas besar 1 Mata Kuliah Strategi Algoritma 2021/2022. Repositori ini berisi kebutuhan dasar dalam menjalankan game _overdrive_. Selain itu, terdapat _bot_ buatan kelompok kami yang dapat digunakan sebagai pemain. _Bot_ berupa kode java dan binary jar yang terletak pada direktori NgengNgengBrr. _Bot_ dirancang dengan strategi _greedy_.  
 <!-- You don't have to answer all the questions - just the ones relevant to your project. -->
 
+## Greedy Algorithm Implementation
+  Algoritma greedy merupakan metode yang popular dan sederhana untuk memecahkan persoalan optimasi. Algoritma ini menyelesaikan masalah ke dalam bentuk langkah-langkah. Pada tiap langkah, algoritma greedy memilih satu pilihan yang dianggap paling baik untuk langkah tersebut sesuai dengan strategi yang digunakan. Setiap pilihan yang diambil dianggap sebagai optimum lokal dengan harapan akan membentuk solusi optimum global.
+  Program ini menggunakan algoritma greedy dalam pengembangan bot untuk mencapai objektif game ini, yaitu untuk memenangkan permainan dengan mencapai garis finish terlebih dahulu. Program mengimplementasikan sistem poin dengan mempertimbangkan kondisi mobil, keadaan blocks di depan mobil, dan keadaan lawan. Dengan sistem poin tersebut, program dapat menentukan command terbaik pada setiap ronde permainan.
 
-## Technologies Used
+
+## Setup
 - Java
 - IntelliJ IDEA
 
-
-## Usage
+## How To Build
 - clone this repository
 - open the directory of the cloned repository
-- run the game by click 'run.bat' or open the terminal with the same directory as the repository and run `./run.bat`
-- Edit game-runner-config.json and game-config.json if you want to configure the game
+- right click on the src folder and choose "Open Folder as IntelliJ IDEA Community Edition Project"
+- on the IntelliJ IDEA screen, click File -> Project Structure
+- go to Project Settings -> Modules
+- Mark "sources" folder as sources
+- go to Project Settings -> Artifacts
+- set the output directory to the repository "bin" folder path
+- build the project by click "Build Artifacts" on the "Build" navbar
 
 
 ## Project Status
