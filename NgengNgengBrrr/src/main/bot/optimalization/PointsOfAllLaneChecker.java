@@ -25,7 +25,7 @@ public class PointsOfAllLaneChecker {
         int ACCELERATE_POINT_BONUS = 3;
         int BOOSTING_POINT_BONUS = 20;
         int bonus_point;
-        Boolean isBoosting = (myCar.speed == 15);
+        boolean isBoosting = (myCar.speed == 15);
 
         List<Integer> pointsPerLane;
 
