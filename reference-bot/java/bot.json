@@ -1,8 +1,14 @@
 {
 	"author": "John Doe",
 	"email": "John.Doe@example.com",
+<<<<<<< HEAD
+	"nickName": "Reference-Bot",
+	"botLocation": "/target",
+	"botFileName": "reference-bot.jar",
+=======
 	"nickName": "CoffeeRef",
 	"botLocation": "/target/jefri",
 	"botFileName": "musuh.jar",
+>>>>>>> main
 	"botLanguage": "java"
 }
