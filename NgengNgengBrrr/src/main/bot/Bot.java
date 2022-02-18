@@ -58,6 +58,7 @@ public class Bot {
         Command COMMAND = LaneChooser.choosingLane(lane_points, power_ups_points, gameState);
 
         //Check damage
+
         if (myCar.damage>0 && (DamageChecker.damage_check(gameState) && myCar.speed < 15))
         {
             return FIX;
@@ -80,6 +81,4 @@ public class Bot {
             return COMMAND;
         }
     }
-
-
 }
