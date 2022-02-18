@@ -12,7 +12,7 @@
 
 
 ## General Information
-Repositori ini merupakan pemenuhan tugas besar 1 Mata Kuliah Strategi Algoritma 2021/2022. Repositori ini berisi kebutuhan dasar dalam menjalankan game _overdrive_. Selain itu, terdapat _bot_ buatan kelompok kami yang dapat digunakan sebagai pemain. _Bot_ berupa kode java dan binary jar yang terletak pada direktori NgengNgengBrr. _Bot_ dirancang dengan strategi _greedy_.  
+Repositori ini merupakan pemenuhan tugas besar 1 Mata Kuliah Strategi Algoritma 2021/2022. Di sini terdapat _bot_ buatan kelompok kami yang dapat digunakan sebagai pemain. _Bot_ berupa kode java dan file binary jar yang merupakan hasil kompilasi kode java. File binary dapat terdapat pada folder "bin" sementara _source code_ kami terdapat pada folder _src_. _Bot_ dirancang dengan strategi _greedy_.  
 <!-- You don't have to answer all the questions - just the ones relevant to your project. -->
 
 ## Greedy Algorithm Implementation
