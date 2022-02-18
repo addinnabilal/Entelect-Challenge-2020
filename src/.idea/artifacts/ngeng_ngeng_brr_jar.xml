@@ -1,8 +1,8 @@
 <component name="ArtifactManager">
-  <artifact type="jar" name="NgengNgengBrrr:jar">
+  <artifact type="jar" name="ngeng_ngeng_brr:jar">
     <output-path>$PROJECT_DIR$/../bin</output-path>
-    <root id="archive" name="NgengNgengBrrr.jar">
-      <element id="module-output" name="NgengNgengBrrr" />
+    <root id="archive" name="ngeng_ngeng_brr.jar">
+      <element id="module-output" name="src" />
       <element id="extracted-dir" path="$MAVEN_REPOSITORY$/com/google/code/gson/gson/2.8.2/gson-2.8.2.jar" path-in-jar="/" />
     </root>
   </artifact>
