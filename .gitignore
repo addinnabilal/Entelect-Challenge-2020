@@ -1,3 +1,2 @@
-match-logs/
-NgengNgengBrrr/out/rounds/*
-NgengNgengBrrr/target/*
+src/bin/rounds/
+bin/rounds/
