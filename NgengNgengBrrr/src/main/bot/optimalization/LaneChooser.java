@@ -18,6 +18,23 @@ public class LaneChooser {
     public final static Command TURN_RIGHT = new ChangeLaneCommand(1);
     public final static Command TURN_LEFT = new ChangeLaneCommand(-1);
 
+    public static Command use_powerups(int commandNum){
+        switch (commandNum) {
+            case 1:
+                return EMP;
+            case 2:
+                return BOOST;
+            case 3:
+                return OIL;
+            case 4:
+                return LIZARD;
+            case 5:
+                return TWEET_COMMAND;
+            default:
+                return ACCELERATE;
+        }
+    }
+
     public static Command choosingLane(List<Integer> lane_points, List<Integer> power_ups_points, GameState gameState){
         //Check max score
         int maxPoint = Collections.max(lane_points);
@@ -33,7 +50,7 @@ public class LaneChooser {
             return ACCELERATE;
         }
         else if(gameState.player.speed < 15){
-            return ConditionChecker.use_powerups(power_ups_points.get(1));
+            return use_powerups(power_ups_points.get(1));
         }
 
         return ACCELERATE;

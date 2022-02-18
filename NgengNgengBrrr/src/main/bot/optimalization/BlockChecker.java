@@ -7,8 +7,8 @@ import java.util.*;
 import static java.lang.Math.max;
 
 public class BlockChecker {
-    
-    //BLOCK CHECKER
+
+    // Function to calculate number of powerups and obstacles in front
     public static List<Integer> getNumOfBlockInFront(int pos_lane, int pos_block, int currSpeed, GameState gameState){
         //Game and player state
         Car myCar = gameState.player;

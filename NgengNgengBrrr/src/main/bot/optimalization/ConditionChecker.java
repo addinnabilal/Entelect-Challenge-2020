@@ -30,12 +30,12 @@ public class ConditionChecker {
     public final static Command TURN_RIGHT = new ChangeLaneCommand(1);
     public final static Command TURN_LEFT = new ChangeLaneCommand(-1);
 
+    // function to check whether blocks contain obstacle or not
     public static Boolean contains_obstacle(List<Object> blocks){
-
         return blocks.contains(Terrain.MUD) || blocks.contains(Terrain.OIL_SPILL) || blocks.contains(Terrain.WALL);
     }
     
-
+    // function to check if powerUpToCheck is available
     public static Boolean hasPowerUp(PowerUps powerUpToCheck, PowerUps[] available) {
         for (PowerUps powerUp: available) {
             if (powerUp.equals(powerUpToCheck)) {
@@ -75,7 +75,9 @@ public class ConditionChecker {
         return  maxSpeed;
     }
 
+    // function to check speed if command applied
     public static int current_speed_if(Car myCar, Command command){
+        // check current max speed first
         int currSpeed, maxSpeed = max_speed_check(myCar);
         if (myCar.speed == 15)
         {
@@ -99,21 +101,5 @@ public class ConditionChecker {
             currSpeed=myCar.speed;
         }
         return currSpeed;
-    }
-    public static Command use_powerups(int commandNum){
-        switch (commandNum) {
-            case 1:
-                return EMP;
-            case 2:
-                return BOOST;
-            case 3:
-                return OIL;
-            case 4:
-                return LIZARD;
-            case 5:
-                return TWEET_COMMAND;
-            default:
-                return ACCELERATE;
-        }
     }
 }

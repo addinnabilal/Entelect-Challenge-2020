@@ -44,7 +44,7 @@ public class PointsOfAllLaneChecker {
             bonus_point += TURNING_POINT_REDUCTION;
             if (isBoosting && PointsFromList.getPointsFromList(pointsPerLane, numOfPowerup).get(1) == 0)
             {
-                bonus_point += BOOSTING_POINT_BONUS;
+                bonus_point += BOOSTING_POINT_BONUS; // boosting success when doesn't hit by obstacle
             }
             lanePoints.set(1, PointsFromList.getPointsFromList(pointsPerLane, numOfPowerup).get(0) + bonus_point);
         }
@@ -57,7 +57,7 @@ public class PointsOfAllLaneChecker {
             bonus_point += TURNING_POINT_REDUCTION;
             if (isBoosting && PointsFromList.getPointsFromList(pointsPerLane, numOfPowerup).get(1) == 0)
             {
-                bonus_point += BOOSTING_POINT_BONUS;
+                bonus_point += BOOSTING_POINT_BONUS; //boosting success when doesn't hit by obstacle
             }
             lanePoints.set(2, PointsFromList.getPointsFromList(pointsPerLane, numOfPowerup).get(0) + bonus_point);
         }
@@ -86,7 +86,7 @@ public class PointsOfAllLaneChecker {
         }
         if (isBoosting && PointsFromList.getPointsFromList(pointsPerLane, numOfPowerup).get(1) == 0)
         {
-            bonus_point += BOOSTING_POINT_BONUS;
+            bonus_point += BOOSTING_POINT_BONUS; //boosting success when doesn't hit by obstacle
         }
         lanePoints.set(choosedLane, PointsFromList.getPointsFromList(pointsPerLane, numOfPowerup).get(0) + bonus_point);
 

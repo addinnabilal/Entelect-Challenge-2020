@@ -9,9 +9,9 @@ public class PointsFromList {
     public static List<Integer> getPointsFromList(List<Integer> pointsPerLane, List<Integer> numOfPowerups){
         List<Integer> points = Arrays.asList(0,1);
         int point = 0;
-        int obstacle = 0; //ngecek ada obstacle apa engga
+        int obstacle = 0; // to store point from obstacle 
 
-        //Membatasi Jumlah Powerups
+        //Membatasi Jumlah Powerups 
         if (numOfPowerups.get(0) < 0)
         {
             point += pointsPerLane.get(2)*(1);  // OIL POWER
