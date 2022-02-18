@@ -25,6 +25,7 @@ Repositori ini merupakan pemenuhan tugas besar 1 Mata Kuliah Strategi Algoritma 
 - clone this repository
 - open the directory of the cloned repository
 - run the game by click 'run.bat' or open the terminal with the same directory as the repository and run `./run.bat`
+- Edit game-runner-config.json and game-config.json if you want to configure the game
 
 
 ## Project Status
